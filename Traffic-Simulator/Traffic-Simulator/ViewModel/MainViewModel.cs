@@ -5,7 +5,7 @@ namespace Traffic_Simulator.ViewModel
     public class MainViewModel : BaseViewModel
     {
         private readonly MainWindow _mainWindow;
-        private string _bgImage = @"C:\Users\petit\Desktop\repos\UO\rok 2\Systemy operacyjne\projekt\Projekt\Projekt\Assets\Image\mapa_v3.png";
+        private string _bgImage = @"C:\Users\petit\Desktop\repos\Traffic-Simulator\Traffic-Simulator\Traffic-Simulator\Assets\Image\mapa_v3.png";
 
         public MainViewModel(MainWindow mainWindow)
         {
@@ -18,7 +18,7 @@ namespace Traffic_Simulator.ViewModel
             
         }
 
-        public DelegateCommand StartAnimationCommand { get; set; }
+        public DelegateCommand StartAnimationCommand { get; }
         
         public string BgImage
         {
