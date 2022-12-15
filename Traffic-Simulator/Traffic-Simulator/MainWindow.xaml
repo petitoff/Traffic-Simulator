@@ -4,9 +4,29 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Traffic_Simulator"
+        xmlns:converter="clr-namespace:Traffic_Simulator.Converter"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow"
+        Height="800"
+        Width="1200">
+    <Window.Resources>
+        <converter:StringToImageConverter x:Key="StringToImageConverter" />
+    </Window.Resources>
     <Grid>
-        
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <Button Command="{Binding StartAnimation}"
+                    Content="Start Animation" />
+        </Grid>
+        <Canvas Grid.Row="1">
+            <Canvas.Background>
+                <ImageBrush ImageSource="{Binding Path=BgImage, Converter={StaticResource StringToImageConverter}}" />
+            </Canvas.Background>
+        </Canvas>
     </Grid>
 </Window>
