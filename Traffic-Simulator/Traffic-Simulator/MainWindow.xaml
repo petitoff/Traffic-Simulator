@@ -16,7 +16,7 @@
                 <Storyboard>
                     <DoubleAnimation Storyboard.TargetName="AnimatedRect"
                                      Storyboard.TargetProperty="(Canvas.Left)"
-                                     To="{Binding ElementName=FixedRect, Path=(Canvas.Left)}"
+                                     To="{Binding ElementName=FixedRect.Left, Path=(Canvas.Left)}"
                                      Duration="0:0:1" />
                     <DoubleAnimation Storyboard.TargetName="AnimatedRect"
                                      Storyboard.TargetProperty="(Canvas.Top)"
