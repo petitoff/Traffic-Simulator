@@ -23,6 +23,7 @@ namespace Traffic_Simulator
         public MainWindow()
         {
             InitializeComponent();
+
         }
     }
 }

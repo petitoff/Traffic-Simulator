@@ -4,9 +4,82 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Traffic_Simulator"
+        xmlns:converter="clr-namespace:Traffic_Simulator.Converter"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="MainWindow"
+        Height="450"
+        Width="800">
+
+    <Window.Resources>
+        <!-- Define the road shape using a PathGeometry object -->
+        <PathGeometry x:Key="RoadPathGeometry">
+            <PathFigure StartPoint="0,0">
+                <LineSegment Point="100,0" />
+                <LineSegment Point="150,50" />
+                <ArcSegment Point="200,100"
+                            Size="50,50"
+                            SweepDirection="Clockwise" />
+            </PathFigure>
+        </PathGeometry>
+
+
+        <converter:PathFigureStartPointConverter x:Key="PathFigureStartPointConverter" />
+    </Window.Resources>
+
+    <Canvas>
+        <!-- Define the road path -->
+        <Canvas.Resources>
+        </Canvas.Resources>
+        <Path x:Name="RoadPath"
+              Stroke="Black"
+              StrokeThickness="1"
+              Data="{StaticResource RoadPathGeometry}"
+              Canvas.Left="249.5"
+              Canvas.Top="156.5" />
+
+        <!-- Define the car shape -->
+        <Rectangle x:Name="CarShape"
+                   Width="100"
+                   Height="50"
+                   RadiusX="10"
+                   RadiusY="10"
+                   Fill="Red"
+                   Canvas.Left="146"
+                   Canvas.Top="74" />
+
+        <!-- Position the car at the start of the road -->
+        <!--<Canvas.Left>
+            <MultiBinding Converter="{StaticResource PathFigureStartPointConverter}">
+                <Binding ElementName="RoadPath"
+                         Path="Data" />
+                <Binding Path="X" />
+            </MultiBinding>
+        </Canvas.Left>
+        <Canvas.Top>
+            <MultiBinding Converter="{StaticResource PathFigureStartPointConverter}">
+                <Binding ElementName="RoadPath"
+                         Path="Data" />
+                <Binding Path="Y" />
+            </MultiBinding>
+        </Canvas.Top>-->
+
+        <!--Define the animation that moves the car along the road -->
+        <Canvas.Triggers>
+            <EventTrigger RoutedEvent="Canvas.Loaded">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <DoubleAnimationUsingPath Storyboard.TargetName="CarShape"
+                                                  Storyboard.TargetProperty="(Canvas.Left)"
+                                                  PathGeometry="{Binding ElementName=RoadPath, Path=Data}"
+                                                  Duration="0:0:10" />
+                        <DoubleAnimationUsingPath Storyboard.TargetName="CarShape"
+                                                  Storyboard.TargetProperty="(Canvas.Top)"
+                                                  PathGeometry="{Binding ElementName=RoadPath, Path=Data}"
+                                                  Duration="0:0:10" />
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+        </Canvas.Triggers>
+    </Canvas>
+
 </Window>
