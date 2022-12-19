@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using Traffic_Simulator.Command;
+using Traffic_Simulator.Model;
 
 namespace Traffic_Simulator.ViewModel
 {
@@ -12,12 +16,12 @@ namespace Traffic_Simulator.ViewModel
         private readonly MainWindow _mainWindow;
         private string _bgImage = @"C:\Users\petit\Desktop\repos\Traffic-Simulator\Traffic-Simulator\Traffic-Simulator\Assets\Image\mapa_v3.png";
 
-        private List<Rectangle> _cars = new List<Rectangle>();
+        private List<Car> _cars = new List<Car>();
 
         public MainViewModel(MainWindow mainWindow)
         {
             _mainWindow = mainWindow;
-            
+
             StartAnimationCommand = new DelegateCommand(StartAnimation);
             CreateRoadCommand = new DelegateCommand(CreateRoad);
         }
@@ -37,49 +41,51 @@ namespace Traffic_Simulator.ViewModel
 
         private void CreateRoad(object obj)
         {
-            Polygon polygon = new Polygon();
+            Rectangle road = new Rectangle
+            {
+                Width = 500,
+                Height = 20,
+                Fill = Brushes.Gray
+            };
 
-            // Set the Stroke and StrokeThickness properties of the polygon.
-            polygon.Stroke = Brushes.Black;
-            polygon.StrokeThickness = 0.1;
-            polygon.Name = "RoadLeft";
+            Canvas.SetTop(road, 210);
 
-            // Set the Fill property of the polygon.
-            polygon.Fill = Brushes.Red;
+            _mainWindow.MainCanvas.Children.Add(road);
 
-            // Create a collection of points for the polygon.
-            PointCollection points = new PointCollection();
-            points.Add(new Point(0, 222));
-            points.Add(new Point(0, 245));
-            points.Add(new Point(755, 245));
-            points.Add(new Point(755, 222));
-
-            // Set the Points property of the polygon to the collection of points.
-            polygon.Points = points;
-
-            // Add the polygon to the visual tree.
-            _mainWindow.MainCanvas.Children.Add(polygon);
+            CreateCar();
         }
 
         private void StartAnimation(object obj)
         {
-            CreateCar();
+            Thread t = new Thread(MoveCar);
+            t.Start();
         }
 
         private void CreateCar()
         {
-            Rectangle car = new Rectangle();
-            car.Width = 30;
-            car.Height = 25;
-            car.Fill = Brushes.Red;
-            Canvas.SetLeft(car, 0);
-            Canvas.SetTop(car, 222);
-            _mainWindow.MainCanvas.Children.Add(car);
+            Car car = new Car(new Point(50, 50), 50, 0, Brushes.Red);
+            AddCarToMainCanvas(car);
             _cars.Add(car);
+        }
+
+        private void AddCarToMainCanvas(Car car)
+        {
+            _mainWindow.MainCanvas.Children.Add(car.Shape);
         }
 
         private void MoveCar()
         {
+            var car1 = _cars[0];
+            
+            for (int i = 0; i < 500; i++)
+            {
+                _mainWindow.Dispatcher.Invoke(() =>
+                {
+                    car1.Position = new Point(i, 218);
+                    car1.UpdateShape(_mainWindow.MainCanvas);
+                });
+                Thread.Sleep(1);
+            }
 
         }
     }
