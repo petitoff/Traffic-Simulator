@@ -14,8 +14,6 @@ namespace Traffic_Simulator;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private readonly DispatcherTimer _timer;
-
     public MainWindow()
     {
         InitializeComponent();

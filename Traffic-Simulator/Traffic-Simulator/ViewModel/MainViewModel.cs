@@ -41,17 +41,6 @@ namespace Traffic_Simulator.ViewModel
 
         private void CreateRoad(object obj)
         {
-            //Rectangle road = new Rectangle
-            //{
-            //    Width = 500,
-            //    Height = 20,
-            //    Fill = Brushes.Gray
-            //};
-
-            //Canvas.SetTop(road, 210);
-
-            //_mainWindow.MainCanvas.Children.Add(road);
-
             CreateCar();
         }
 
@@ -102,10 +91,10 @@ namespace Traffic_Simulator.ViewModel
                 {
                     break;
                 }
-                Thread.Sleep(50);
+                Thread.Sleep(10);
             }
 
-            _mainWindow.MainCanvas.Dispatcher.Invoke(() => car1.Speed = 5);
+            //_mainWindow.MainCanvas.Dispatcher.Invoke(() => car1.Speed = 5);
 
             for (int i = 0; i < 500; i++)
             {
@@ -114,7 +103,7 @@ namespace Traffic_Simulator.ViewModel
                     if (car1.Direction >= -3.1)
                     {
                         car1.Direction -= 0.1;
-                        car1.Position = new Point(car1.Position.X, car1.Position.Y + 1);
+                        car1.Position = car1.Position with { Y = car1.Position.Y + 1 };
                     }
                     else
                     {
@@ -133,32 +122,32 @@ namespace Traffic_Simulator.ViewModel
                     car1PositionLeft = Canvas.GetLeft(car1.Shape);
                 });
 
-                if (car1PositionLeft < 262)
+                if (car1PositionLeft < 200)
                 {
                     break;
                 }
-                Thread.Sleep(50);
+                Thread.Sleep(10);
             }
 
-            for(int i = 0; i < 500; i++)
+            for (int i = 0; i < 500; i++)
             {
                 _mainWindow.Dispatcher.Invoke(() =>
                 {
-                    if (car1.Direction <=0)
+                    if (car1.Direction < 0)
                     {
-                        car1.Direction += 0.05;
-                        car1.Position = new Point(car1.Position.X, car1.Position.Y + 1);
+                        car1.Direction += 0.09;
+                        car1.Position = car1.Position with { Y = car1.Position.Y + 3 };
                     }
                     else
                     {
                         car1.Direction = 0;
                     }
 
-                    car1.Position = car1.Position with { X = car1.Position.X + 1 };
+                    car1.Position = car1.Position with { X = car1.Position.X + 0.7 };
                     car1.UpdateShape(_mainWindow.MainCanvas);
                     car1.UpdatePosition();
                 });
-                Thread.Sleep(50);
+                Thread.Sleep(10);
             }
         }
     }
