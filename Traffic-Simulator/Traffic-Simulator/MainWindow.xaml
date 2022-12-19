@@ -11,35 +11,27 @@
         Width="1200"
         ResizeMode="NoResize">
 
-    <Window.Resources>
-        <converter:StringToImageConverter x:Key="StringToImageConverter" />
-    </Window.Resources>
     <Grid>
-
         <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="100" />
+            <RowDefinition />
         </Grid.RowDefinitions>
 
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0"
-                    Content="Create Road"
-                    Command="{Binding CreateRoadCommand}"/>
-
-            <Button Grid.Column="1"
-                    Content="Start Animation"
+        <StackPanel Orientation="Horizontal">
+            <Button Content="Create"
+                    Width="100"
+                    Command="{Binding CreateRoadCommand}" />
+            <Button Content="Start"
+                    Width="100"
                     Command="{Binding StartAnimationCommand}" />
-        </Grid>
-        <Canvas Name="MainCanvas"
-                Grid.Row="1">
+        </StackPanel>
+        <Canvas Grid.Row="1"
+                x:Name="MainCanvas">
             <Canvas.Background>
-                <ImageBrush ImageSource="{Binding Path=BgImage, Converter={StaticResource StringToImageConverter}}" />
+                <ImageBrush ImageSource="{Binding BgImage}"></ImageBrush>
             </Canvas.Background>
+
         </Canvas>
     </Grid>
 </Window>

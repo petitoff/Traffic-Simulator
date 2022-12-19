@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using Traffic_Simulator.Command;
+using Traffic_Simulator.Model;
 
 namespace Traffic_Simulator.ViewModel
 {
@@ -12,12 +16,12 @@ namespace Traffic_Simulator.ViewModel
         private readonly MainWindow _mainWindow;
         private string _bgImage = @"C:\Users\petit\Desktop\repos\Traffic-Simulator\Traffic-Simulator\Traffic-Simulator\Assets\Image\mapa_v3.png";
 
-        private List<Rectangle> _cars = new List<Rectangle>();
+        private List<Car> _cars = new List<Car>();
 
         public MainViewModel(MainWindow mainWindow)
         {
             _mainWindow = mainWindow;
-            
+
             StartAnimationCommand = new DelegateCommand(StartAnimation);
             CreateRoadCommand = new DelegateCommand(CreateRoad);
         }
@@ -37,50 +41,114 @@ namespace Traffic_Simulator.ViewModel
 
         private void CreateRoad(object obj)
         {
-            Polygon polygon = new Polygon();
-
-            // Set the Stroke and StrokeThickness properties of the polygon.
-            polygon.Stroke = Brushes.Black;
-            polygon.StrokeThickness = 0.1;
-            polygon.Name = "RoadLeft";
-
-            // Set the Fill property of the polygon.
-            polygon.Fill = Brushes.Red;
-
-            // Create a collection of points for the polygon.
-            PointCollection points = new PointCollection();
-            points.Add(new Point(0, 222));
-            points.Add(new Point(0, 245));
-            points.Add(new Point(755, 245));
-            points.Add(new Point(755, 222));
-
-            // Set the Points property of the polygon to the collection of points.
-            polygon.Points = points;
-
-            // Add the polygon to the visual tree.
-            _mainWindow.MainCanvas.Children.Add(polygon);
+            CreateCar();
         }
 
         private void StartAnimation(object obj)
         {
-            CreateCar();
+            Thread t = new Thread(MoveCar);
+            t.Start();
         }
 
         private void CreateCar()
         {
-            Rectangle car = new Rectangle();
-            car.Width = 30;
-            car.Height = 25;
-            car.Fill = Brushes.Red;
-            Canvas.SetLeft(car, 0);
-            Canvas.SetTop(car, 222);
-            _mainWindow.MainCanvas.Children.Add(car);
+            Car car = new Car(new Point(0, 218), 5, 0, Brushes.Red);
+            AddCarToMainCanvas(car);
             _cars.Add(car);
+        }
+
+        private void AddCarToMainCanvas(Car car)
+        {
+            _mainWindow.MainCanvas.Children.Add(car.Shape);
         }
 
         private void MoveCar()
         {
+            if (_cars.Count <= 0)
+            {
+                return;
+            }
 
+            var car1 = _cars[0];
+
+            for (int i = 0; i < 800; i++)
+            {
+                _mainWindow.Dispatcher.Invoke(() =>
+                {
+                    car1.Position = new Point(car1.Position.X + 1, 218);
+                    car1.UpdateShape(_mainWindow.MainCanvas);
+                    car1.UpdatePosition();
+                });
+
+                double car1PositionLeft = 0;
+
+                _mainWindow.Dispatcher.Invoke(() =>
+                {
+                    car1PositionLeft = Canvas.GetLeft(car1.Shape);
+                });
+
+                if (car1PositionLeft > 800)
+                {
+                    break;
+                }
+                Thread.Sleep(10);
+            }
+
+            //_mainWindow.MainCanvas.Dispatcher.Invoke(() => car1.Speed = 5);
+
+            for (int i = 0; i < 500; i++)
+            {
+                _mainWindow.Dispatcher.Invoke(() =>
+                {
+                    if (car1.Direction >= -3.1)
+                    {
+                        car1.Direction -= 0.1;
+                        car1.Position = car1.Position with { Y = car1.Position.Y + 1 };
+                    }
+                    else
+                    {
+                        car1.Direction = -3.12;
+                    }
+
+                    car1.Position = car1.Position with { X = car1.Position.X + 1 };
+                    car1.UpdateShape(_mainWindow.MainCanvas);
+                    car1.UpdatePosition();
+                });
+
+                double car1PositionLeft = 0;
+
+                _mainWindow.Dispatcher.Invoke(() =>
+                {
+                    car1PositionLeft = Canvas.GetLeft(car1.Shape);
+                });
+
+                if (car1PositionLeft < 200)
+                {
+                    break;
+                }
+                Thread.Sleep(10);
+            }
+
+            for (int i = 0; i < 500; i++)
+            {
+                _mainWindow.Dispatcher.Invoke(() =>
+                {
+                    if (car1.Direction < 0)
+                    {
+                        car1.Direction += 0.09;
+                        car1.Position = car1.Position with { Y = car1.Position.Y + 3 };
+                    }
+                    else
+                    {
+                        car1.Direction = 0;
+                    }
+
+                    car1.Position = car1.Position with { X = car1.Position.X + 0.7 };
+                    car1.UpdateShape(_mainWindow.MainCanvas);
+                    car1.UpdatePosition();
+                });
+                Thread.Sleep(10);
+            }
         }
     }
 }
