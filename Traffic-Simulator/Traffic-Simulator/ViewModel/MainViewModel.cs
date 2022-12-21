@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Shapes;
-using System.Windows.Threading;
 using Traffic_Simulator.Command;
 using Traffic_Simulator.Model;
 
@@ -52,9 +49,11 @@ namespace Traffic_Simulator.ViewModel
 
         private void CreateCar()
         {
-            Car car = new Car(new Point(0, 218), 5, 0, Brushes.Red);
+            Car car = new Car(new Point(-20, 218), 5, 0, Brushes.Red);
             AddCarToMainCanvas(car);
             _cars.Add(car);
+            car.UpdateShape(_mainWindow.MainCanvas);
+            car.UpdatePosition();
         }
 
         private void AddCarToMainCanvas(Car car)
@@ -93,8 +92,6 @@ namespace Traffic_Simulator.ViewModel
                 }
                 Thread.Sleep(10);
             }
-
-            //_mainWindow.MainCanvas.Dispatcher.Invoke(() => car1.Speed = 5);
 
             for (int i = 0; i < 500; i++)
             {
@@ -147,6 +144,18 @@ namespace Traffic_Simulator.ViewModel
                     car1.UpdateShape(_mainWindow.MainCanvas);
                     car1.UpdatePosition();
                 });
+
+                double car1PositionLeft = 0;
+
+                _mainWindow.Dispatcher.Invoke(() =>
+                {
+                    car1PositionLeft = Canvas.GetLeft(car1.Shape);
+                });
+
+                if (car1PositionLeft > 1200)
+                {
+                    break;
+                }
                 Thread.Sleep(10);
             }
         }
