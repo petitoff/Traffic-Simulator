@@ -8,25 +8,30 @@
         mc:Ignorable="d"
         Title="MainWindow"
         Height="800"
-        Width="1200">
-    <Window.Resources>
-        <converter:StringToImageConverter x:Key="StringToImageConverter" />
-    </Window.Resources>
-    <Grid>
+        Width="1200"
+        ResizeMode="NoResize">
 
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="100" />
+            <RowDefinition />
         </Grid.RowDefinitions>
 
-        <Grid>
-            <Button Command="{Binding StartAnimation}"
-                    Content="Start Animation" />
-        </Grid>
-        <Canvas Grid.Row="1">
+
+        <StackPanel Orientation="Horizontal">
+            <Button Content="Create"
+                    Width="100"
+                    Command="{Binding CreateRoadCommand}" />
+            <Button Content="Start"
+                    Width="100"
+                    Command="{Binding StartAnimationCommand}" />
+        </StackPanel>
+        <Canvas Grid.Row="1"
+                x:Name="MainCanvas">
             <Canvas.Background>
-                <ImageBrush ImageSource="{Binding Path=BgImage, Converter={StaticResource StringToImageConverter}}" />
+                <ImageBrush ImageSource="{Binding BgImage}"></ImageBrush>
             </Canvas.Background>
+
         </Canvas>
     </Grid>
 </Window>
