@@ -18,10 +18,9 @@ jobs:
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
 
     steps:
-    - uses: action/checkout@v2
     
-    - name: Setup msbuild
-      uses: microsoft/setup.msbuild@v1
+    - name: setup-msbuild
+      uses: microsoft/setup-msbuild@v1.0.2
       
     # - name: Setip NuGet
     #  uses: Nuget/setup-msbuild@v1
