@@ -7,21 +7,25 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows;
+using Traffic_Simulator.Const;
 
 namespace Traffic_Simulator.Model
 {
     public class Car
     {
         // Properties
+        public int Id { get; set; }
         public Point Position { get; set; }
         public double Speed { get; set; }
         public double Direction { get; set; }
         public Brush Color { get; set; }
         public Ellipse Shape { get; set; }
+        public TopOrButton TopOrButton { get; set; } 
 
         // Constructor
-        public Car(Point position, double speed, double direction, Brush color)
+        public Car(int id, Point position, double speed, double direction, Brush color, TopOrButton topOrButton)
         {
+            Id = id;
             Position = position;
             Speed = speed;
             Direction = direction;
@@ -32,6 +36,7 @@ namespace Traffic_Simulator.Model
                 Height = 30,
                 Fill = color
             };
+            TopOrButton = topOrButton;
         }
 
         // Method to update the car's position based on its speed and direction

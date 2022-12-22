@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Traffic_Simulator.Command;
+using Traffic_Simulator.Const;
 using Traffic_Simulator.Model;
 
 namespace Traffic_Simulator.ViewModel
@@ -12,7 +14,7 @@ namespace Traffic_Simulator.ViewModel
     {
         private readonly MainWindow _mainWindow;
         private string _bgImage = @"C:\Users\petit\Desktop\repos\Traffic-Simulator\Traffic-Simulator\Traffic-Simulator\Assets\Image\mapa_v3.png";
-
+        private Thread _mainThread;
         private List<Car> _cars = new List<Car>();
 
         public MainViewModel(MainWindow mainWindow)
@@ -36,20 +38,58 @@ namespace Traffic_Simulator.ViewModel
             }
         }
 
+        public void AbortMainThread()
+        {
+            // TODO: Making threads stop correctly
+            _mainThread.Abort();
+        }
+
         private void CreateRoad(object obj)
         {
-            CreateCar();
+            //CreateCar();
         }
 
         private void StartAnimation(object obj)
         {
-            Thread t = new Thread(MoveCar);
-            t.Start();
+            _mainThread = new Thread(ManageAnimation);
+            _mainThread.Start();
         }
 
-        private void CreateCar()
+        private void ManageAnimation()
         {
-            Car car = new Car(new Point(-20, 218), 5, 0, Brushes.Red);
+            _mainWindow.Dispatcher.Invoke(() =>
+            {
+                CreateCar(TopOrButton.FromTopToBottom);
+                CreateCar(TopOrButton.FromBottomToTop);
+            });
+
+            for (int i = 0; i < 2; i++)
+            {
+                Thread t = _cars[i].TopOrButton == TopOrButton.FromTopToBottom
+                    ? new Thread(() => MoveCar(_cars[i]))
+                    : new Thread(() => MoveCarFromBottomToTop(_cars[i]));
+                t.Start();
+
+                Thread.Sleep(1000);
+            }
+        }
+
+        private void CreateCar(TopOrButton topOrButton)
+        {
+            Car car;
+            Point startPoint = topOrButton == TopOrButton.FromTopToBottom ? new Point(-20, 218) : new Point(1200, 538);
+
+
+            if (_cars.Count == 0)
+            {
+                car = new Car(id: 0, startPoint, 5, 0, Brushes.Red, topOrButton);
+            }
+            else
+            {
+                var carIdBefore = _cars.Last().Id + 1;
+                car = new Car(carIdBefore, startPoint, 5, 0, Brushes.Red, topOrButton);
+            }
+
             AddCarToMainCanvas(car);
             _cars.Add(car);
             car.UpdateShape(_mainWindow.MainCanvas);
@@ -61,29 +101,27 @@ namespace Traffic_Simulator.ViewModel
             _mainWindow.MainCanvas.Children.Add(car.Shape);
         }
 
-        private void MoveCar()
+        private void MoveCar(Car car)
         {
             if (_cars.Count <= 0)
             {
                 return;
             }
 
-            var car1 = _cars[0];
-
             for (int i = 0; i < 800; i++)
             {
                 _mainWindow.Dispatcher.Invoke(() =>
                 {
-                    car1.Position = new Point(car1.Position.X + 1, 218);
-                    car1.UpdateShape(_mainWindow.MainCanvas);
-                    car1.UpdatePosition();
+                    car.Position = new Point(car.Position.X + 1, 218);
+                    car.UpdateShape(_mainWindow.MainCanvas);
+                    car.UpdatePosition();
                 });
 
                 double car1PositionLeft = 0;
 
                 _mainWindow.Dispatcher.Invoke(() =>
                 {
-                    car1PositionLeft = Canvas.GetLeft(car1.Shape);
+                    car1PositionLeft = Canvas.GetLeft(car.Shape);
                 });
 
                 if (car1PositionLeft > 800)
@@ -97,29 +135,29 @@ namespace Traffic_Simulator.ViewModel
             {
                 _mainWindow.Dispatcher.Invoke(() =>
                 {
-                    if (car1.Direction >= -3.1)
+                    if (car.Direction >= -3.1)
                     {
-                        car1.Direction -= 0.1;
-                        car1.Position = car1.Position with { Y = car1.Position.Y + 1 };
+                        car.Direction -= 0.1;
+                        car.Position = car.Position with { Y = car.Position.Y + 1.5 };
                     }
                     else
                     {
-                        car1.Direction = -3.12;
+                        car.Direction = -3.144;
                     }
 
-                    car1.Position = car1.Position with { X = car1.Position.X + 1 };
-                    car1.UpdateShape(_mainWindow.MainCanvas);
-                    car1.UpdatePosition();
+                    car.Position = car.Position with { X = car.Position.X + 0.8 };
+                    car.UpdateShape(_mainWindow.MainCanvas);
+                    car.UpdatePosition();
                 });
 
                 double car1PositionLeft = 0;
 
                 _mainWindow.Dispatcher.Invoke(() =>
                 {
-                    car1PositionLeft = Canvas.GetLeft(car1.Shape);
+                    car1PositionLeft = Canvas.GetLeft(car.Shape);
                 });
 
-                if (car1PositionLeft < 200)
+                if (car1PositionLeft < 180)
                 {
                     break;
                 }
@@ -130,29 +168,122 @@ namespace Traffic_Simulator.ViewModel
             {
                 _mainWindow.Dispatcher.Invoke(() =>
                 {
-                    if (car1.Direction < 0)
+                    if (car.Direction < 0)
                     {
-                        car1.Direction += 0.09;
-                        car1.Position = car1.Position with { Y = car1.Position.Y + 3 };
+                        car.Direction += 0.08;
+                        car.Position = car.Position with { Y = car.Position.Y + 2 };
                     }
                     else
                     {
-                        car1.Direction = 0;
+                        car.Direction = 0;
                     }
 
-                    car1.Position = car1.Position with { X = car1.Position.X + 0.7 };
-                    car1.UpdateShape(_mainWindow.MainCanvas);
-                    car1.UpdatePosition();
+                    car.Position = car.Position with { X = car.Position.X + 1 };
+                    car.UpdateShape(_mainWindow.MainCanvas);
+                    car.UpdatePosition();
                 });
 
                 double car1PositionLeft = 0;
 
                 _mainWindow.Dispatcher.Invoke(() =>
                 {
-                    car1PositionLeft = Canvas.GetLeft(car1.Shape);
+                    car1PositionLeft = Canvas.GetLeft(car.Shape);
                 });
 
                 if (car1PositionLeft > 1200)
+                {
+                    break;
+                }
+                Thread.Sleep(10);
+            }
+        }
+
+        private void MoveCarFromBottomToTop(Car car)
+        {
+            for (int i = 0; i < 500; i++)
+            {
+                _mainWindow.Dispatcher.Invoke(() =>
+                {
+                    car.Direction = -3.144;
+                    car.Position = car.Position with { X = car.Position.X + 1 };
+                    car.UpdateShape(_mainWindow.MainCanvas);
+                    car.UpdatePosition();
+                });
+
+                double car1PositionLeft = 0;
+
+                _mainWindow.Dispatcher.Invoke(() =>
+                {
+                    car1PositionLeft = Canvas.GetLeft(car.Shape);
+                });
+
+                if (car1PositionLeft < 230)
+                {
+                    break;
+                }
+                Thread.Sleep(10);
+            }
+
+            for (int i = 0; i < 500; i++)
+            {
+                _mainWindow.Dispatcher.Invoke(() =>
+                {
+                    if (car.Direction >= -6.24)
+                    {
+                        car.Direction -= 0.07;
+                        //car.Position = car.Position with { Y = car.Position.Y + 1 };
+                    }
+                    else
+                    {
+                        car.Direction = -6.24;
+                    }
+
+                    car.Position = car.Position with { X = car.Position.X + 1};
+                    car.UpdateShape(_mainWindow.MainCanvas);
+                    car.UpdatePosition();
+                });
+
+                double car1PositionLeft = 0;
+
+                _mainWindow.Dispatcher.Invoke(() =>
+                {
+                    car1PositionLeft = Canvas.GetLeft(car.Shape);
+                });
+
+                if (car1PositionLeft > 818)
+                {
+                    break;
+                }
+                Thread.Sleep(10);
+            }
+
+            for (int i = 0; i < 500; i++)
+            {
+                _mainWindow.Dispatcher.Invoke(() =>
+                {
+                    if (car.Direction <= -3.09)
+                    {
+                        car.Direction += 0.06;
+                        car.Position = car.Position with { Y = car.Position.Y - 0.8 };
+                    }
+                    else
+                    {
+                        car.Direction = -3.09;
+                    }
+
+                    car.Position = car.Position with { X = car.Position.X + 1 };
+                    car.UpdateShape(_mainWindow.MainCanvas);
+                    car.UpdatePosition();
+                });
+
+                double car1PositionLeft = 0;
+
+                _mainWindow.Dispatcher.Invoke(() =>
+                {
+                    car1PositionLeft = Canvas.GetLeft(car.Shape);
+                });
+
+                if (car1PositionLeft < -50)
                 {
                     break;
                 }

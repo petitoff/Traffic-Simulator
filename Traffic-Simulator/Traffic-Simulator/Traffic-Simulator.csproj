@@ -60,6 +60,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Command\DelegateCommand.cs" />
+    <Compile Include="Const\TopOrButton.cs" />
     <Compile Include="Converter\StringToImageConverter.cs" />
     <Compile Include="Model\Car.cs" />
     <Compile Include="ViewModel\BaseViewModel.cs" />
