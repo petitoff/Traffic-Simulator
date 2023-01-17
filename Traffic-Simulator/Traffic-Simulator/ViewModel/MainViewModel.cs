@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -7,6 +8,7 @@ using System.Windows.Media;
 using Traffic_Simulator.Command;
 using Traffic_Simulator.Const;
 using Traffic_Simulator.Model;
+using Traffic_Simulator.Simulation;
 
 namespace Traffic_Simulator.ViewModel
 {
@@ -17,16 +19,22 @@ namespace Traffic_Simulator.ViewModel
         private Thread _mainThread;
         private List<Car> _cars = new List<Car>();
 
+        public ObservableCollection<CarInstance> Cars;
+
         public MainViewModel(MainWindow mainWindow)
         {
             _mainWindow = mainWindow;
 
             StartAnimationCommand = new DelegateCommand(StartAnimation);
             CreateRoadCommand = new DelegateCommand(CreateRoad);
+
+            CarsManagement = new CarsManagement(this, _mainWindow);
+            Cars = new ObservableCollection<CarInstance>();
         }
 
         public DelegateCommand StartAnimationCommand { get; }
         public DelegateCommand CreateRoadCommand { get; }
+        public CarsManagement CarsManagement { get; }
 
         public string BgImage
         {
@@ -41,7 +49,7 @@ namespace Traffic_Simulator.ViewModel
         public void AbortMainThread()
         {
             // TODO: Making threads stop correctly
-            _mainThread.Abort();
+            //_mainThread.Abort();
         }
 
         private void CreateRoad(object obj)
@@ -51,21 +59,30 @@ namespace Traffic_Simulator.ViewModel
 
         private void StartAnimation(object obj)
         {
-            _mainThread = new Thread(ManageAnimation);
+            _mainThread = new Thread(CarsManagement.StartAnimation);
             _mainThread.Start();
+            
+            //_mainThread = new Thread(ManageAnimation);
+            //_mainThread.Start();
         }
 
         private void ManageAnimation()
         {
             _mainWindow.Dispatcher.Invoke(() =>
             {
-                CreateCar(TopOrButton.FromTopToBottom);
-                CreateCar(TopOrButton.FromBottomToTop);
+                CreateCar(TraversalDirection.FromTopToBottom);
+                CreateCar(TraversalDirection.FromBottomToTop);
+
+                CreateCar(TraversalDirection.FromTopToBottom);
+                CreateCar(TraversalDirection.FromBottomToTop);
+
+                CreateCar(TraversalDirection.FromTopToBottom);
+                CreateCar(TraversalDirection.FromBottomToTop);
             });
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < _cars.Count; i++)
             {
-                Thread t = _cars[i].TopOrButton == TopOrButton.FromTopToBottom
+                Thread t = _cars[i].TraversalDirection == TraversalDirection.FromTopToBottom
                     ? new Thread(() => MoveCar(_cars[i]))
                     : new Thread(() => MoveCarFromBottomToTop(_cars[i]));
                 t.Start();
@@ -74,20 +91,20 @@ namespace Traffic_Simulator.ViewModel
             }
         }
 
-        private void CreateCar(TopOrButton topOrButton)
+        private void CreateCar(TraversalDirection traversalDirection)
         {
             Car car;
-            Point startPoint = topOrButton == TopOrButton.FromTopToBottom ? new Point(-20, 218) : new Point(1200, 538);
+            Point startPoint = traversalDirection == TraversalDirection.FromTopToBottom ? new Point(-20, 218) : new Point(1220, 538);
 
 
             if (_cars.Count == 0)
             {
-                car = new Car(id: 0, startPoint, 5, 0, Brushes.Red, topOrButton);
+                car = new Car(id: 0, startPoint, 5, 0, Brushes.HotPink, traversalDirection);
             }
             else
             {
                 var carIdBefore = _cars.Last().Id + 1;
-                car = new Car(carIdBefore, startPoint, 5, 0, Brushes.Red, topOrButton);
+                car = new Car(carIdBefore, startPoint, 5, 0, Brushes.HotPink, traversalDirection);
             }
 
             AddCarToMainCanvas(car);

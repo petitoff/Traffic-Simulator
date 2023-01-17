@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -20,10 +16,10 @@ namespace Traffic_Simulator.Model
         public double Direction { get; set; }
         public Brush Color { get; set; }
         public Ellipse Shape { get; set; }
-        public TopOrButton TopOrButton { get; set; } 
+        public TraversalDirection TraversalDirection { get; set; } 
 
         // Constructor
-        public Car(int id, Point position, double speed, double direction, Brush color, TopOrButton topOrButton)
+        public Car(int id, Point position, double speed, double direction, Brush color, TraversalDirection traversalDirection)
         {
             Id = id;
             Position = position;
@@ -36,7 +32,7 @@ namespace Traffic_Simulator.Model
                 Height = 30,
                 Fill = color
             };
-            TopOrButton = topOrButton;
+            TraversalDirection = traversalDirection;
         }
 
         // Method to update the car's position based on its speed and direction

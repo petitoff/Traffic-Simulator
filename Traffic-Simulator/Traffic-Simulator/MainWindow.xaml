@@ -7,21 +7,20 @@
         xmlns:converter="clr-namespace:Traffic_Simulator.Converter"
         mc:Ignorable="d"
         Title="MainWindow"
-        Height="800"
+        Height="900"
         Width="1200"
         ResizeMode="NoResize">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="100" />
+            <RowDefinition Height="80" />
             <RowDefinition />
         </Grid.RowDefinitions>
 
-
         <StackPanel Orientation="Horizontal">
-            <Button Content="Create"
+            <!--<Button Content="Create"
                     Width="100"
-                    Command="{Binding CreateRoadCommand}" />
+                    Command="{Binding CreateRoadCommand}" />-->
             <Button Content="Start"
                     Width="100"
                     Command="{Binding StartAnimationCommand}" />
