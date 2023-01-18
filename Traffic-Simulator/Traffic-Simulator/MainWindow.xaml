@@ -17,13 +17,17 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Horizontal" Background="White">
             <!--<Button Content="Create"
                     Width="100"
                     Command="{Binding CreateRoadCommand}" />-->
             <Button Content="Start"
                     Width="100"
                     Command="{Binding StartAnimationCommand}" />
+            <Button Content="Uruchom pociąg"
+                    Width="100"
+                    Command="{Binding StartTrainCommand}" />
+            <TextBlock Text="{Binding TrainActive}"></TextBlock>
         </StackPanel>
         <Canvas Grid.Row="1"
                 x:Name="MainCanvas">

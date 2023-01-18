@@ -19,7 +19,9 @@ namespace Traffic_Simulator.ViewModel
         private Thread _mainThread;
         private List<Car> _cars = new List<Car>();
 
-        public ObservableCollection<CarInstance> Cars;
+
+
+        private string _trainActive;
 
         public MainViewModel(MainWindow mainWindow)
         {
@@ -27,14 +29,30 @@ namespace Traffic_Simulator.ViewModel
 
             StartAnimationCommand = new DelegateCommand(StartAnimation);
             CreateRoadCommand = new DelegateCommand(CreateRoad);
+            StartTrainCommand = new DelegateCommand(StartTrain);
 
             CarsManagement = new CarsManagement(this, _mainWindow);
             Cars = new ObservableCollection<CarInstance>();
+            Trains = new ObservableCollection<TrainInstance>();
         }
 
         public DelegateCommand StartAnimationCommand { get; }
         public DelegateCommand CreateRoadCommand { get; }
+        public DelegateCommand StartTrainCommand { get; }
         public CarsManagement CarsManagement { get; }
+
+        public ObservableCollection<CarInstance> Cars { get; set; }
+        public ObservableCollection<TrainInstance> Trains { get; set; }
+
+        public string TrainActive
+        {
+            get => _trainActive;
+            set
+            {
+                _trainActive = value;
+                OnPropertyChanged();
+            }
+        }
 
         public string BgImage
         {
@@ -50,6 +68,14 @@ namespace Traffic_Simulator.ViewModel
         {
             // TODO: Making threads stop correctly
             //_mainThread.Abort();
+        }
+
+        private void StartTrain(object obj)
+        {
+            CarsManagement.IsTrainActive = true;
+            TrainActive = "Pociąg jest aktywny";
+
+            CarsManagement.StartTrain();
         }
 
         private void CreateRoad(object obj)

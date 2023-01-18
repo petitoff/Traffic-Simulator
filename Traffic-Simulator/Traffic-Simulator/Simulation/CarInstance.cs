@@ -5,7 +5,7 @@ namespace Traffic_Simulator.Simulation
 {
     public class CarInstance
     {
-        public Car Car;
+        public readonly Car Car;
         private readonly MainViewModel _mainViewModel;
 
         public CarInstance(Car car, MainViewModel mainViewModel)
