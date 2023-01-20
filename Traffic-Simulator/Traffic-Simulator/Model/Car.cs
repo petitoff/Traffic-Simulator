@@ -16,7 +16,8 @@ namespace Traffic_Simulator.Model
         public double Direction { get; set; }
         public Brush Color { get; set; }
         public Ellipse Shape { get; set; }
-        public TraversalDirection TraversalDirection { get; set; } 
+        public TraversalDirection TraversalDirection { get; set; }
+        public bool IsCarActive { get; set; }
 
         // Constructor
         public Car(int id, Point position, double speed, double direction, Brush color, TraversalDirection traversalDirection)

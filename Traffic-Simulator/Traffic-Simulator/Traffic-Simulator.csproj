@@ -64,9 +64,9 @@
     <Compile Include="Converter\StringToImageConverter.cs" />
     <Compile Include="Model\Car.cs" />
     <Compile Include="Model\Train.cs" />
-    <Compile Include="Simulation\CarInstance.cs" />
+    <Compile Include="Simulation\CarData.cs" />
     <Compile Include="Simulation\CarsManagement.cs" />
-    <Compile Include="Simulation\TrainInstance.cs" />
+    <Compile Include="Simulation\TrainData.cs" />
     <Compile Include="ViewModel\BaseViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Page Include="MainWindow.xaml">

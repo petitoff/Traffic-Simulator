@@ -14,14 +14,18 @@ namespace Traffic_Simulator.ViewModel
 {
     public class MainViewModel : BaseViewModel
     {
+        public bool IsAnimationActive;
         private readonly MainWindow _mainWindow;
         private string _bgImage = @"C:\Users\petit\Desktop\repos\Traffic-Simulator\Traffic-Simulator\Traffic-Simulator\Assets\Image\mapa_v3.png";
         private Thread _mainThread;
+        private Thread _trainThread;
         private List<Car> _cars = new List<Car>();
 
 
 
-        private string _trainActive;
+        private string _trainActiveMessage;
+        private string _numbersOfCars;
+        private TrainData? _trainData;
 
         public MainViewModel(MainWindow mainWindow)
         {
@@ -32,8 +36,9 @@ namespace Traffic_Simulator.ViewModel
             StartTrainCommand = new DelegateCommand(StartTrain);
 
             CarsManagement = new CarsManagement(this, _mainWindow);
-            Cars = new ObservableCollection<CarInstance>();
-            Trains = new ObservableCollection<TrainInstance>();
+            Cars = new ObservableCollection<CarData>();
+            CarsThreads = new ObservableCollection<Thread>();
+            IsAnimationActive = true;
         }
 
         public DelegateCommand StartAnimationCommand { get; }
@@ -41,15 +46,25 @@ namespace Traffic_Simulator.ViewModel
         public DelegateCommand StartTrainCommand { get; }
         public CarsManagement CarsManagement { get; }
 
-        public ObservableCollection<CarInstance> Cars { get; set; }
-        public ObservableCollection<TrainInstance> Trains { get; set; }
-
-        public string TrainActive
+        public TrainData? TrainData
         {
-            get => _trainActive;
+            get => _trainData;
             set
             {
-                _trainActive = value;
+                _trainData = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<CarData> Cars { get; set; }
+        public ObservableCollection<Thread> CarsThreads { get; set; }
+
+        public string TrainActiveMessage
+        {
+            get => _trainActiveMessage;
+            set
+            {
+                _trainActiveMessage = value;
                 OnPropertyChanged();
             }
         }
@@ -64,32 +79,43 @@ namespace Traffic_Simulator.ViewModel
             }
         }
 
+        public string NumberOfCars
+        {
+            get => _numbersOfCars;
+            set
+            {
+                _numbersOfCars = value;
+                OnPropertyChanged();
+            }
+        }
+
         public void AbortMainThread()
         {
             // TODO: Making threads stop correctly
             //_mainThread.Abort();
-        }
 
-        private void StartTrain(object obj)
-        {
-            CarsManagement.IsTrainActive = true;
-            TrainActive = "Pociąg jest aktywny";
-
-            CarsManagement.StartTrain();
-        }
-
-        private void CreateRoad(object obj)
-        {
-            //CreateCar();
+            IsAnimationActive = false;
         }
 
         private void StartAnimation(object obj)
         {
             _mainThread = new Thread(CarsManagement.StartAnimation);
             _mainThread.Start();
-            
-            //_mainThread = new Thread(ManageAnimation);
-            //_mainThread.Start();
+
+            _trainThread = new Thread(CarsManagement.StartTrain);
+            _trainThread.Start();
+        }
+
+
+        private void StartTrain(object obj)
+        {
+            _trainThread = new Thread(CarsManagement.StartTrain);
+            _trainThread.Start();
+        }
+
+        private void CreateRoad(object obj)
+        {
+            //CreateCar();
         }
 
         private void ManageAnimation()
@@ -281,7 +307,7 @@ namespace Traffic_Simulator.ViewModel
                         car.Direction = -6.24;
                     }
 
-                    car.Position = car.Position with { X = car.Position.X + 1};
+                    car.Position = car.Position with { X = car.Position.X + 1 };
                     car.UpdateShape(_mainWindow.MainCanvas);
                     car.UpdatePosition();
                 });
