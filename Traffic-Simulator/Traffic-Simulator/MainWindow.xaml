@@ -7,24 +7,48 @@
         xmlns:converter="clr-namespace:Traffic_Simulator.Converter"
         mc:Ignorable="d"
         Title="MainWindow"
-        Height="800"
+        Height="900"
         Width="1200"
         ResizeMode="NoResize">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="100" />
+            <RowDefinition Height="80" />
             <RowDefinition />
         </Grid.RowDefinitions>
 
-
-        <StackPanel Orientation="Horizontal">
-            <Button Content="Create"
+        <StackPanel Orientation="Horizontal"
+                    Background="White">
+            <!--<Button Content="Create"
                     Width="100"
-                    Command="{Binding CreateRoadCommand}" />
+                    Command="{Binding CreateRoadCommand}" />-->
             <Button Content="Start"
                     Width="100"
                     Command="{Binding StartAnimationCommand}" />
+            <!--<Button Content="Uruchom pociąg"
+                    Width="100"
+                    Command="{Binding StartTrainCommand}" />-->
+            <TextBlock Text="{Binding TrainActiveMessage}"
+                       VerticalAlignment="Center"
+                       Margin="20 0" />
+            <StackPanel Orientation="Horizontal"
+                        VerticalAlignment="Center">
+                <TextBlock Text="Ilość samochodów: " />
+                <TextBox Width="50"
+                         Height="20"
+                         Text="{Binding NumberOfCars, UpdateSourceTrigger=LostFocus}">
+                </TextBox>
+            </StackPanel>
+
+            <TextBlock VerticalAlignment="Center"
+                       Margin="25 0">
+                <TextBlock.Text>
+                    <Binding Path="NumberOfCars">
+                        <Binding.StringFormat>Ilość aktywnych samochodów: {0}</Binding.StringFormat>
+                    </Binding>
+                </TextBlock.Text>
+            </TextBlock>
+            
         </StackPanel>
         <Canvas Grid.Row="1"
                 x:Name="MainCanvas">

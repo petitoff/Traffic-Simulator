@@ -1,13 +1,13 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using System.Windows;
 using Traffic_Simulator.Const;
 
 namespace Traffic_Simulator.Model
 {
-    public class Car
+    public class Train
     {
         // Properties
         public int Id { get; set; }
@@ -15,22 +15,21 @@ namespace Traffic_Simulator.Model
         public double Speed { get; set; }
         public double Direction { get; set; }
         public Brush Color { get; set; }
-        public Ellipse Shape { get; set; }
+        public Rectangle Shape { get; set; }
         public TraversalDirection TraversalDirection { get; set; }
-        public bool IsCarActive { get; set; }
 
         // Constructor
-        public Car(int id, Point position, double speed, double direction, Brush color, TraversalDirection traversalDirection)
+        public Train(int id, Point position, double speed, double direction, Brush color, TraversalDirection traversalDirection)
         {
             Id = id;
             Position = position;
             Speed = speed;
             Direction = direction;
             Color = color;
-            Shape = new Ellipse
+            Shape = new Rectangle
             {
-                Width = 40,
-                Height = 30,
+                Width = 50,
+                Height = 80,
                 Fill = color
             };
             TraversalDirection = traversalDirection;
