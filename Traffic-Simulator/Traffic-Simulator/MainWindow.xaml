@@ -31,24 +31,16 @@
             <TextBlock Text="{Binding TrainActiveMessage}"
                        VerticalAlignment="Center"
                        Margin="20 0" />
-            <StackPanel Orientation="Horizontal"
-                        VerticalAlignment="Center">
-                <TextBlock Text="Ilość samochodów: " />
-                <TextBox Width="50"
-                         Height="20"
-                         Text="{Binding NumberOfCars, UpdateSourceTrigger=LostFocus}">
-                </TextBox>
-            </StackPanel>
 
-            <TextBlock VerticalAlignment="Center"
+            <!--<TextBlock VerticalAlignment="Center"
                        Margin="25 0">
                 <TextBlock.Text>
                     <Binding Path="NumberOfCars">
                         <Binding.StringFormat>Ilość aktywnych samochodów: {0}</Binding.StringFormat>
                     </Binding>
                 </TextBlock.Text>
-            </TextBlock>
-            
+            </TextBlock>-->
+
         </StackPanel>
         <Canvas Grid.Row="1"
                 x:Name="MainCanvas">
