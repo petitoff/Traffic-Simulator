@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -33,32 +32,45 @@ public class CarsManagement
         {
             try
             {
-                var localNumberOfCars = int.Parse(_mainViewModel.NumberOfCars);
+                //var localNumberOfCars = int.Parse(_mainViewModel.NumberOfCars);
 
-                if (localNumberOfCars == 0)
-                {
-                    continue;
-                }
-                
-                if (localNumberOfCars != _numberOfCars)
-                {
-                    // remove all cars
-                    _mainViewModel.Cars.Clear();
+                //if (localNumberOfCars == 0)
+                //{
+                //    continue;
+                //}
 
-                    // stop all thread from CarsThreads
-                    foreach (var carThread in _mainViewModel.CarsThreads)
+                //if (localNumberOfCars != _numberOfCars)
+                //{
+                //    // remove all cars
+                //    _mainViewModel.Cars.Clear();
+
+                //    // stop all thread from CarsThreads
+                //    foreach (var carThread in _mainViewModel.CarsThreads)
+                //    {
+                //        carThread.Abort();
+                //    }
+
+                //    _numberOfCars = localNumberOfCars;
+                //}
+
+
+                int localNumberOfCars = int.Parse(_mainViewModel.NumberOfCars);
+                if (_mainViewModel.Cars.Count < localNumberOfCars)
+                {
+                    for (int i = 0; i < localNumberOfCars; i++)
                     {
-                        carThread.Abort();
-                    }
+                        // random number, 0 or 1
+                        var random = new Random().Next(0, 2);
 
-                    _numberOfCars = localNumberOfCars;
-                }
+                        // if random number == 0 create new card from top to bottom
+                        // else create new card from bottom to top
+                        CreateNewCar(random == 0
+                            ? TraversalDirection.FromTopToBottom
+                            : TraversalDirection.FromBottomToTop);
 
-                if (_mainViewModel.Cars.Count < _numberOfCars)
-                {
-                    for (int i = 0; i < _numberOfCars; i++)
-                    {
-                        CreateCar(TraversalDirection.FromTopToBottom);
+                        // for dev
+                        //CreateNewCar(TraversalDirection.FromBottomToTop);
+
 
                         // get last car from list
                         var car = _mainViewModel.Cars.Last();
@@ -83,16 +95,43 @@ public class CarsManagement
     {
         while (true)
         {
+
+            if (IsTrainActive)
+            {
+                continue;
+            }
+
             var random = new Random();
-            var randomNumber = random.Next(10, 15);
+            //var randomNumber = random.Next(10, 15);
+            var randomNumber = random.Next(1, 5);
             randomNumber *= 1000;
 
             Thread.Sleep(randomNumber);
             _mainViewModel.TrainData = null;
-            
+
             CreateTrain();
             CreateThreadForTrain(_mainViewModel.TrainData);
-            
+
+        }
+    }
+
+    /// <summary>
+    /// Method to delete car from canvas and list
+    /// </summary>
+    /// <param name="carId">Id of car to delete</param>
+    public void DeleteCar(int carId)
+    {
+        var car = _mainViewModel.Cars.FirstOrDefault(c => c.Car.Id == carId);
+        if (car is not null)
+        {
+            _mainViewModel.Cars.Remove(car);
+            _mainViewModel.NumberOfCars =  _mainViewModel.Cars.Count.ToString();
+        }
+
+        var carThread = _mainViewModel.CarsThreads.FirstOrDefault(c => c.ManagedThreadId == carId);
+        if (carThread is not null)
+        {
+            _mainViewModel.CarsThreads.Remove(carThread);
         }
     }
 
@@ -100,10 +139,10 @@ public class CarsManagement
     /// Method to create a new car
     /// </summary>
     /// <param name="traversalDirection">The direction in which the car will move</param>
-    private void CreateCar(TraversalDirection traversalDirection)
+    private void CreateNewCar(TraversalDirection traversalDirection)
     {
         var topStartPoint = new Point(-20, 259);
-        var bottomStartPoint = new Point(1220, 538);
+        var bottomStartPoint = new Point(1220, 633);
         Point startPoint = traversalDirection == TraversalDirection.FromTopToBottom ? topStartPoint : bottomStartPoint;
 
         // get last car in _mainViewModel.Cars
@@ -118,18 +157,6 @@ public class CarsManagement
         });
     }
 
-    private void DeleteCar(int carId)
-    {
-        _mainWindow.Dispatcher.Invoke(() =>
-        {
-            var car = _mainViewModel.Cars.FirstOrDefault(c => c.Car.Id == carId);
-            if (car is not null)
-            {
-                _mainViewModel.Cars.Remove(car);
-            }
-        });
-    }
-
     private void CreateCarThread(CarData carData)
     {
         var t = new Thread(carData.StartMovingCar);
@@ -138,7 +165,7 @@ public class CarsManagement
         // add thread to list of thread car
         _mainViewModel.CarsThreads.Add(t);
 
-        
+
     }
 
     private void CreateTrain()
@@ -185,13 +212,17 @@ public class CarsManagement
             double distanceFromTopBorder = 0;
             _mainWindow.Dispatcher.Invoke(() =>
             {
+                if (trainInstance == null)
+                {
+                    return;
+                }
+
                 trainInstance.Train.Position =
                     trainInstance.Train.Position with { X = trainInstance.Train.Position.X + 0.6 };
                 trainInstance.Train.UpdateShape(_mainWindow.MainCanvas);
                 trainInstance.Train.UpdatePosition();
 
                 distanceFromTopBorder = Canvas.GetTop(trainInstance.Train.Shape);
-
             });
 
             if (distanceFromTopBorder > 800)
