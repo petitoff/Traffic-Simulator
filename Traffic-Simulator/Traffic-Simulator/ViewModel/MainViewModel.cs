@@ -15,13 +15,9 @@ namespace Traffic_Simulator.ViewModel
     public class MainViewModel : BaseViewModel
     {
         public bool IsAnimationActive;
-        private readonly MainWindow _mainWindow;
         private string _bgImage = @"C:\Users\petit\Desktop\repos\Traffic-Simulator\Traffic-Simulator\Traffic-Simulator\Assets\Image\mapa_v3.png";
         private Thread _mainThread;
         private Thread _trainThread;
-        private List<Car> _cars = new List<Car>();
-
-
 
         private string _trainActiveMessage;
         private string _numbersOfCars;
@@ -29,20 +25,16 @@ namespace Traffic_Simulator.ViewModel
 
         public MainViewModel(MainWindow mainWindow)
         {
-            _mainWindow = mainWindow;
-
             StartAnimationCommand = new DelegateCommand(StartAnimation);
-            CreateRoadCommand = new DelegateCommand(CreateRoad);
             StartTrainCommand = new DelegateCommand(StartTrain);
 
-            CarsManagement = new CarsManagement(this, _mainWindow);
+            CarsManagement = new CarsManagement(this, mainWindow);
             Cars = new ObservableCollection<CarData>();
             CarsThreads = new ObservableCollection<Thread>();
             IsAnimationActive = true;
         }
 
         public DelegateCommand StartAnimationCommand { get; }
-        public DelegateCommand CreateRoadCommand { get; }
         public DelegateCommand StartTrainCommand { get; }
         public CarsManagement CarsManagement { get; }
 
@@ -111,38 +103,6 @@ namespace Traffic_Simulator.ViewModel
         {
             _trainThread = new Thread(CarsManagement.StartTrain);
             _trainThread.Start();
-        }
-
-        private void CreateRoad(object obj)
-        {
-            //CreateCar();
-        }
-
-        private void CreateCar(TraversalDirection traversalDirection)
-        {
-            Car car;
-            Point startPoint = traversalDirection == TraversalDirection.FromTopToBottom ? new Point(-20, 218) : new Point(1220, 538);
-
-
-            if (_cars.Count == 0)
-            {
-                car = new Car(id: 0, startPoint, 5, 0, Brushes.HotPink, traversalDirection);
-            }
-            else
-            {
-                var carIdBefore = _cars.Last().Id + 1;
-                car = new Car(carIdBefore, startPoint, 5, 0, Brushes.HotPink, traversalDirection);
-            }
-
-            AddCarToMainCanvas(car);
-            _cars.Add(car);
-            car.UpdateShape(_mainWindow.MainCanvas);
-            car.UpdatePosition();
-        }
-
-        private void AddCarToMainCanvas(Car car)
-        {
-            _mainWindow.MainCanvas.Children.Add(car.Shape);
         }
     }
 }
