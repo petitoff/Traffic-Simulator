@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -31,48 +30,27 @@ public class CarsManagement
     {
         while (_mainViewModel.IsAnimationActive)
         {
-            try
-            {
-                var localNumberOfCars = int.Parse(_mainViewModel.NumberOfCars);
+            // random number, 0 or 1
+            var random = new Random().Next(0, 2);
 
-                if (localNumberOfCars == 0)
-                {
-                    continue;
-                }
-                
-                if (localNumberOfCars != _numberOfCars)
-                {
-                    // remove all cars
-                    _mainViewModel.Cars.Clear();
+            // if random number == 0 create new card from top to bottom
+            // else create new card from bottom to top
+            CreateNewCar(random == 0
+                ? TraversalDirection.FromTopToBottom
+                : TraversalDirection.FromBottomToTop);
 
-                    // stop all thread from CarsThreads
-                    foreach (var carThread in _mainViewModel.CarsThreads)
-                    {
-                        carThread.Abort();
-                    }
+            // for dev
+            //CreateNewCar(TraversalDirection.FromBottomToTop);
 
-                    _numberOfCars = localNumberOfCars;
-                }
 
-                if (_mainViewModel.Cars.Count < _numberOfCars)
-                {
-                    for (int i = 0; i < _numberOfCars; i++)
-                    {
-                        CreateCar(TraversalDirection.FromTopToBottom);
+            // get last car from list
+            var car = _mainViewModel.Cars.Last();
+            CreateCarThread(car);
 
-                        // get last car from list
-                        var car = _mainViewModel.Cars.Last();
-                        CreateCarThread(car);
-
-                        Thread.Sleep(2000);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                _mainViewModel.NumberOfCars = "0";
-                MessageBox.Show($"Error: {e.Message}\nSolution: Please enter a valid number of cars");
-            }
+            // random number from 2 to 4
+            var randomSpawnCar = new Random().Next(2, 4);
+            randomSpawnCar *= 1000;
+            Thread.Sleep(randomSpawnCar);
         }
     }
 
@@ -83,16 +61,44 @@ public class CarsManagement
     {
         while (true)
         {
+
+            if (IsTrainActive)
+            {
+                continue;
+            }
+
             var random = new Random();
-            var randomNumber = random.Next(10, 15);
+            //var randomNumber = random.Next(10, 15);
+            var randomNumber = random.Next(1, 5);
             randomNumber *= 1000;
 
             Thread.Sleep(randomNumber);
             _mainViewModel.TrainData = null;
-            
+
             CreateTrain();
-            CreateThreadForTrain(_mainViewModel.TrainData);
-            
+            //CreateThreadForTrain(_mainViewModel.TrainData);
+            CreateThreadForInstance(_mainViewModel.TrainData, MoveTrain);
+
+        }
+    }
+
+    /// <summary>
+    /// Method to delete car from canvas and list
+    /// </summary>
+    /// <param name="carId">Id of car to delete</param>
+    public void DeleteCar(int carId)
+    {
+        var car = _mainViewModel.Cars.FirstOrDefault(c => c.Car.Id == carId);
+        if (car is not null)
+        {
+            _mainViewModel.Cars.Remove(car);
+            _mainViewModel.NumberOfCars = _mainViewModel.Cars.Count.ToString();
+        }
+
+        var carThread = _mainViewModel.CarsThreads.FirstOrDefault(c => c.ManagedThreadId == carId);
+        if (carThread is not null)
+        {
+            _mainViewModel.CarsThreads.Remove(carThread);
         }
     }
 
@@ -100,14 +106,17 @@ public class CarsManagement
     /// Method to create a new car
     /// </summary>
     /// <param name="traversalDirection">The direction in which the car will move</param>
-    private void CreateCar(TraversalDirection traversalDirection)
+    private void CreateNewCar(TraversalDirection traversalDirection)
     {
         var topStartPoint = new Point(-20, 259);
-        var bottomStartPoint = new Point(1220, 538);
+        var bottomStartPoint = new Point(1220, 633);
         Point startPoint = traversalDirection == TraversalDirection.FromTopToBottom ? topStartPoint : bottomStartPoint;
 
+        // get list of Cars with the same traversalDirection
+        var carsWithSameTraversalDirection = _mainViewModel.Cars.Where(x => x.Car.TraversalDirection == traversalDirection).ToList();
+
         // get last car in _mainViewModel.Cars
-        var lastCar = _mainViewModel.Cars.LastOrDefault();
+        var lastCar = carsWithSameTraversalDirection.LastOrDefault();
         int localId = lastCar is not null ? lastCar.Car.Id + 1 : 0;
 
         _mainWindow.Dispatcher.Invoke(() =>
@@ -115,18 +124,6 @@ public class CarsManagement
             var car = new Car(localId, startPoint, 2, 0, Brushes.HotPink, traversalDirection);
             var carInstance = new CarData(car, _mainWindow, _mainViewModel, this);
             _mainViewModel.Cars.Add(carInstance);
-        });
-    }
-
-    private void DeleteCar(int carId)
-    {
-        _mainWindow.Dispatcher.Invoke(() =>
-        {
-            var car = _mainViewModel.Cars.FirstOrDefault(c => c.Car.Id == carId);
-            if (car is not null)
-            {
-                _mainViewModel.Cars.Remove(car);
-            }
         });
     }
 
@@ -138,7 +135,7 @@ public class CarsManagement
         // add thread to list of thread car
         _mainViewModel.CarsThreads.Add(t);
 
-        
+
     }
 
     private void CreateTrain()
@@ -155,7 +152,10 @@ public class CarsManagement
 
     private void CreateThreadForTrain(TrainData? trainInstance)
     {
-        Thread t = new Thread(() => MoveTrain(trainInstance));
+        Thread t = new Thread(() =>
+        {
+            if (trainInstance != null) MoveTrain(trainInstance);
+        });
         t.Start();
     }
 
@@ -164,13 +164,18 @@ public class CarsManagement
 
     }
 
-    private Thread CreateThreadForInstance<T>(T instance, Action<T> move)
+    private void CreateThreadForInstance<T>(T instance, Action<T> move)
     {
-        return new Thread(() => move(instance));
+        Thread t = new Thread(() =>
+        {
+            if (instance != null) move(instance);
+        });
+        t.Start();
     }
 
-    private void MoveTrain(TrainData? trainInstance)
+    private void MoveTrain(TrainData trainInstance)
     {
+        if (trainInstance == null) throw new ArgumentNullException(nameof(trainInstance));
         if (IsTrainActive)
         {
             return;
@@ -191,7 +196,6 @@ public class CarsManagement
                 trainInstance.Train.UpdatePosition();
 
                 distanceFromTopBorder = Canvas.GetTop(trainInstance.Train.Shape);
-
             });
 
             if (distanceFromTopBorder > 800)
