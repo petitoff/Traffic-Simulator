@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
@@ -14,11 +15,19 @@ namespace Traffic_Simulator;
 /// </summary>
 public partial class MainWindow : Window
 {
+    private MainViewModel _mainViewModel;
     public MainWindow()
     {
         InitializeComponent();
 
-        var viewModel = new MainViewModel(this);
-        DataContext = viewModel;
+        _mainViewModel = new MainViewModel(this);
+        DataContext = _mainViewModel;
+
+        this.Closing += OnClosing;
+    }
+
+    private void OnClosing(object sender, CancelEventArgs e)
+    {
+        _mainViewModel.AbortMainThread();
     }
 }
