@@ -138,11 +138,22 @@ public class CarsManagement
     {
         try
         {
-            Point startPoint = new Point(1035, -150);
+            Point startPointTop = new Point(1033, -150);
+            Point startPointBottom = new Point(1033, 790);
+
+            double fromTop = -2.21;
+            double fromBottom = 2.22;
+
+            // generate random number 0 or 1
+            var random = new Random().Next(0, 2);
+            var direction = random == 0 ? fromTop : fromBottom;
+            var startPoint = random == 0 ? startPointTop : startPointBottom;
+            var traversalDirection =
+                random == 0 ? TraversalDirection.FromTopToBottom : TraversalDirection.FromBottomToTop;
 
             _mainWindow.Dispatcher.Invoke(() =>
             {
-                var train = new Train(0, startPoint, 1, -2.2, Brushes.HotPink, TraversalDirection.FromTopToBottom);
+                var train = new Train(0, startPoint, 1, direction, Brushes.HotPink, traversalDirection);
                 var trainInstance = new TrainData(train, _mainViewModel);
                 _mainViewModel.TrainData = trainInstance;
             });
@@ -189,7 +200,13 @@ public class CarsManagement
                     distanceFromTopBorder = Canvas.GetTop(trainInstance.Train.Shape);
                 });
 
-                if (distanceFromTopBorder > 800)
+                if (distanceFromTopBorder > 800 && trainInstance.Train.TraversalDirection == TraversalDirection.FromTopToBottom)
+                {
+                    break;
+                }
+
+                if (distanceFromTopBorder < -200 &&
+                    trainInstance.Train.TraversalDirection == TraversalDirection.FromBottomToTop)
                 {
                     break;
                 }
