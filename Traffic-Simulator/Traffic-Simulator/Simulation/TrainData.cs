@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Traffic_Simulator.Model;
+﻿using Traffic_Simulator.Model;
 using Traffic_Simulator.ViewModel;
 
 namespace Traffic_Simulator.Simulation

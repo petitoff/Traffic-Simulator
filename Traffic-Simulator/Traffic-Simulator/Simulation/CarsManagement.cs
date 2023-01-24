@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -15,7 +16,6 @@ public class CarsManagement
     public bool IsTrainActive;
     private readonly MainViewModel _mainViewModel;
     private readonly MainWindow _mainWindow;
-    private int _numberOfCars;
 
     public CarsManagement(MainViewModel mainViewModel, MainWindow mainWindow)
     {
@@ -39,10 +39,6 @@ public class CarsManagement
                 ? TraversalDirection.FromTopToBottom
                 : TraversalDirection.FromBottomToTop);
 
-            // for dev
-            //CreateNewCar(TraversalDirection.FromBottomToTop);
-
-
             // get last car from list
             var car = _mainViewModel.Cars.Last();
             CreateCarThread(car);
@@ -59,7 +55,7 @@ public class CarsManagement
     /// </summary>
     public void StartTrain()
     {
-        while (true)
+        while (_mainViewModel.IsAnimationActive)
         {
 
             if (IsTrainActive)
@@ -140,28 +136,21 @@ public class CarsManagement
 
     private void CreateTrain()
     {
-        Point startPoint = new Point(1035, -150);
-
-        _mainWindow.Dispatcher.Invoke(() =>
+        try
         {
-            var train = new Train(0, startPoint, 1, -2.2, Brushes.HotPink, TraversalDirection.FromTopToBottom);
-            var trainInstance = new TrainData(train, _mainViewModel);
-            _mainViewModel.TrainData = trainInstance;
-        });
-    }
+            Point startPoint = new Point(1035, -150);
 
-    private void CreateThreadForTrain(TrainData? trainInstance)
-    {
-        Thread t = new Thread(() =>
+            _mainWindow.Dispatcher.Invoke(() =>
+            {
+                var train = new Train(0, startPoint, 1, -2.2, Brushes.HotPink, TraversalDirection.FromTopToBottom);
+                var trainInstance = new TrainData(train, _mainViewModel);
+                _mainViewModel.TrainData = trainInstance;
+            });
+        }
+        catch (TaskCanceledException)
         {
-            if (trainInstance != null) MoveTrain(trainInstance);
-        });
-        t.Start();
-    }
 
-    private void CreateInstance<T>()
-    {
-
+        }
     }
 
     private void CreateThreadForInstance<T>(T instance, Action<T> move)
@@ -173,41 +162,48 @@ public class CarsManagement
         t.Start();
     }
 
-    private void MoveTrain(TrainData trainInstance)
+    private void MoveTrain(TrainData? trainInstance)
     {
-        if (trainInstance == null) throw new ArgumentNullException(nameof(trainInstance));
-        if (IsTrainActive)
+        try
         {
-            return;
-        }
-
-        IsTrainActive = true;
-
-        _mainViewModel.TrainActiveMessage = "Pociąg jest aktywny";
-
-        while (true)
-        {
-            double distanceFromTopBorder = 0;
-            _mainWindow.Dispatcher.Invoke(() =>
+            if (trainInstance == null) throw new ArgumentNullException(nameof(trainInstance));
+            if (IsTrainActive)
             {
-                trainInstance.Train.Position =
-                    trainInstance.Train.Position with { X = trainInstance.Train.Position.X + 0.6 };
-                trainInstance.Train.UpdateShape(_mainWindow.MainCanvas);
-                trainInstance.Train.UpdatePosition();
-
-                distanceFromTopBorder = Canvas.GetTop(trainInstance.Train.Shape);
-            });
-
-            if (distanceFromTopBorder > 800)
-            {
-                break;
+                return;
             }
 
-            Thread.Sleep(3);
+            IsTrainActive = true;
+
+            _mainViewModel.TrainActiveMessage = "Pociąg jest aktywny";
+
+            while (true)
+            {
+                double distanceFromTopBorder = 0;
+                _mainWindow.Dispatcher.Invoke(() =>
+                {
+                    trainInstance.Train.Position =
+                        trainInstance.Train.Position with { X = trainInstance.Train.Position.X + 0.6 };
+                    trainInstance.Train.UpdateShape(_mainWindow.MainCanvas);
+                    trainInstance.Train.UpdatePosition();
+
+                    distanceFromTopBorder = Canvas.GetTop(trainInstance.Train.Shape);
+                });
+
+                if (distanceFromTopBorder > 800)
+                {
+                    break;
+                }
+
+                Thread.Sleep(3);
+            }
+
+            IsTrainActive = false;
+
+            _mainViewModel.TrainActiveMessage = "Pociąg jest nieaktywny";
         }
+        catch (TaskCanceledException)
+        {
 
-        IsTrainActive = false;
-
-        _mainViewModel.TrainActiveMessage = "Pociąg jest nieaktywny";
+        }
     }
 }

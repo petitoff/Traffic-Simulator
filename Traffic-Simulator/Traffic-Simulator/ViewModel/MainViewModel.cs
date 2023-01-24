@@ -1,13 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Collections.ObjectModel;
 using System.Threading;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
 using Traffic_Simulator.Command;
-using Traffic_Simulator.Const;
-using Traffic_Simulator.Model;
 using Traffic_Simulator.Simulation;
 
 namespace Traffic_Simulator.ViewModel
@@ -26,7 +19,6 @@ namespace Traffic_Simulator.ViewModel
         public MainViewModel(MainWindow mainWindow)
         {
             StartAnimationCommand = new DelegateCommand(StartAnimation);
-            StartTrainCommand = new DelegateCommand(StartTrain);
 
             CarsManagement = new CarsManagement(this, mainWindow);
             Cars = new ObservableCollection<CarData>();
@@ -35,7 +27,6 @@ namespace Traffic_Simulator.ViewModel
         }
 
         public DelegateCommand StartAnimationCommand { get; }
-        public DelegateCommand StartTrainCommand { get; }
         public CarsManagement CarsManagement { get; }
 
         public TrainData? TrainData
@@ -83,9 +74,6 @@ namespace Traffic_Simulator.ViewModel
 
         public void AbortMainThread()
         {
-            // TODO: Making threads stop correctly
-            //_mainThread.Abort();
-
             IsAnimationActive = false;
         }
 

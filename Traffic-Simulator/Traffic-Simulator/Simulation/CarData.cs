@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Runtime.ConstrainedExecution;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -15,9 +14,9 @@ namespace Traffic_Simulator.Simulation
     {
         public readonly Car Car;
         private readonly MainViewModel _mainViewModel;
-        private MainWindow _mainWindow;
+        private readonly MainWindow _mainWindow;
         private readonly CarsManagement _carsManagement;
-        private int _cordXOfRailway = 1090;
+        private readonly int _cordXOfRailway = 1090;
 
         public CarData(Car car, MainWindow mainWindow, MainViewModel mainViewModel, CarsManagement carsManagement)
         {
@@ -49,7 +48,7 @@ namespace Traffic_Simulator.Simulation
         private bool CheckDistanceBetweenNearCar()
         {
             if (_mainViewModel.Cars.Count <= 1) return false;
-            
+
             var carsWithSameTraversalDirection = _mainViewModel.Cars.Where(x => x.Car.TraversalDirection == Car.TraversalDirection).ToList();
 
             var carAfterThatCar = carsWithSameTraversalDirection.FirstOrDefault(x => x.Car.Id == Car.Id - 1);
@@ -101,7 +100,7 @@ namespace Traffic_Simulator.Simulation
         private Task MoveCarFromTop()
         {
             // do prawej
-            while (Car.Position.X <= 780)
+            while (_mainViewModel.IsAnimationActive && Car.Position.X <= 780)
             {
                 _mainWindow.Dispatcher.Invoke(() =>
                 {
@@ -114,7 +113,7 @@ namespace Traffic_Simulator.Simulation
             }
 
             // zakręt w prawo i do lewej
-            while (true)
+            while (_mainViewModel.IsAnimationActive)
             {
                 double distanceFromLeftBorder = 0;
                 _mainWindow.Dispatcher.Invoke(() =>
@@ -144,7 +143,7 @@ namespace Traffic_Simulator.Simulation
                 Thread.Sleep(3);
             }
 
-            while (true)
+            while (_mainViewModel.IsAnimationActive)
             {
                 double distanceFromLeftBorder = 0;
 
@@ -176,7 +175,7 @@ namespace Traffic_Simulator.Simulation
             }
 
             // droga w prawo i pociąg
-            while (true)
+            while (_mainViewModel.IsAnimationActive)
             {
                 if (CheckDistanceBetweenNearCar())
                 {
@@ -249,12 +248,12 @@ namespace Traffic_Simulator.Simulation
         private Task MoveCarFromBottom()
         {
             _mainWindow.Dispatcher.Invoke(() =>
-            {
-                Car.Direction = -3.143;
-                Car.UpdateDirection();
-            });
+                {
+                    Car.Direction = -3.143;
+                    Car.UpdateDirection();
+                });
 
-            while (true)
+            while (_mainViewModel.IsAnimationActive)
             {
                 if (CheckDistanceBetweenNearCar())
                 {
@@ -264,7 +263,7 @@ namespace Traffic_Simulator.Simulation
 
                     continue;
                 }
-                
+
                 double distanceFromLeftBorder = 0;
 
                 if (_carsManagement.IsTrainActive && Car.Position.X > _cordXOfRailway && Car.Position.X < 1150)
@@ -277,7 +276,9 @@ namespace Traffic_Simulator.Simulation
                             Car.Speed -= 1;
                             Car.Position =
                                 Car.Position with
-                                { X = Car.Position.X + 1 };
+                                {
+                                    X = Car.Position.X + 1
+                                };
                         }
                         else
                         {
@@ -300,10 +301,7 @@ namespace Traffic_Simulator.Simulation
                     });
                 }
 
-                _mainWindow.Dispatcher.Invoke(() =>
-                {
-                    distanceFromLeftBorder = Canvas.GetLeft(Car.Shape);
-                });
+                _mainWindow.Dispatcher.Invoke(() => { distanceFromLeftBorder = Canvas.GetLeft(Car.Shape); });
 
                 if (distanceFromLeftBorder < 240)
                 {
@@ -313,20 +311,19 @@ namespace Traffic_Simulator.Simulation
                 Thread.Sleep(3);
             }
 
-            while (true)
+            while (_mainViewModel.IsAnimationActive)
             {
                 double distanceFromLeftBorder = 0;
 
                 _mainWindow.Dispatcher.Invoke(() =>
                 {
-                    if (Car.Direction >= -6.23)
+                    if (Car.Direction >= -6.26)
                     {
                         Car.Direction -= 0.025;
-                        //car.Position = car.Position with { Y = car.Position.Y + 1 };
                     }
                     else
                     {
-                        Car.Direction = -6.23;
+                        Car.Direction = -6.26;
                     }
 
                     Car.Position = Car.Position with { X = Car.Position.X + 0.2 };
@@ -334,51 +331,48 @@ namespace Traffic_Simulator.Simulation
                     Car.UpdatePosition();
                 });
 
-                _mainWindow.Dispatcher.Invoke(() =>
-                {
-                    distanceFromLeftBorder = Canvas.GetLeft(Car.Shape);
-                });
+                _mainWindow.Dispatcher.Invoke(() => { distanceFromLeftBorder = Canvas.GetLeft(Car.Shape); });
 
                 if (distanceFromLeftBorder > 818)
                 {
                     break;
                 }
+
                 Thread.Sleep(3);
             }
 
-            while (true)
+            while (_mainViewModel.IsAnimationActive)
             {
                 double distanceFromLeftBorder = 0;
 
                 _mainWindow.Dispatcher.Invoke(() =>
                 {
-                    if (Car.Direction <= -3.158)
+                    if (Car.Direction <= -3.156)
                     {
-                        Car.Direction += 0.017;
+                        Car.Direction += 0.016;
                     }
                     else
                     {
-                        Car.Direction = -3.158;
+                        Car.Direction = -3.156;
                     }
 
-                    Car.Position = Car.Position with { X = Car.Position.X + 0.3 };
+                    Car.Position = Car.Position with { X = Car.Position.X + 0.1 };
                     Car.UpdateShape(_mainWindow.MainCanvas);
                     Car.UpdatePosition();
                 });
 
-                _mainWindow.Dispatcher.Invoke(() =>
-                {
-                    distanceFromLeftBorder = Canvas.GetLeft(Car.Shape);
-                });
+                _mainWindow.Dispatcher.Invoke(() => { distanceFromLeftBorder = Canvas.GetLeft(Car.Shape); });
 
                 if (distanceFromLeftBorder < -50)
                 {
                     break;
                 }
+
                 Thread.Sleep(3);
             }
 
             return Task.CompletedTask;
+
         }
     }
 }

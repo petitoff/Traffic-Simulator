@@ -26,6 +26,7 @@ public partial class MainWindow : Window
         this.Closing += OnClosing;
     }
 
+
     private void OnClosing(object sender, CancelEventArgs e)
     {
         _mainViewModel.AbortMainThread();
