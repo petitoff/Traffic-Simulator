@@ -4,6 +4,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows;
 using Traffic_Simulator.Const;
+using System.Windows.Media.Imaging;
 
 namespace Traffic_Simulator.Model
 {
@@ -33,6 +34,10 @@ namespace Traffic_Simulator.Model
                 Height = 30,
                 Fill = color
             };
+
+            BitmapImage image = new BitmapImage(new Uri("pack://application:,,,/Assets/Image/CarModel.png", UriKind.Absolute));
+            ImageBrush brush = new ImageBrush(image);
+            Shape.Fill = brush;
             TraversalDirection = traversalDirection;
         }
 

@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Traffic_Simulator"
-        xmlns:converter="clr-namespace:Traffic_Simulator.Converter"
         mc:Ignorable="d"
         Title="MainWindow"
         Height="900"
@@ -19,27 +18,13 @@
 
         <StackPanel Orientation="Horizontal"
                     Background="White">
-            <!--<Button Content="Create"
-                    Width="100"
-                    Command="{Binding CreateRoadCommand}" />-->
+
             <Button Content="Start"
                     Width="100"
                     Command="{Binding StartAnimationCommand}" />
-            <!--<Button Content="Uruchom pociąg"
-                    Width="100"
-                    Command="{Binding StartTrainCommand}" />-->
             <TextBlock Text="{Binding TrainActiveMessage}"
                        VerticalAlignment="Center"
                        Margin="20 0" />
-
-            <!--<TextBlock VerticalAlignment="Center"
-                       Margin="25 0">
-                <TextBlock.Text>
-                    <Binding Path="NumberOfCars">
-                        <Binding.StringFormat>Ilość aktywnych samochodów: {0}</Binding.StringFormat>
-                    </Binding>
-                </TextBlock.Text>
-            </TextBlock>-->
 
         </StackPanel>
         <Canvas Grid.Row="1"
