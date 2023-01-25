@@ -8,7 +8,7 @@ namespace Traffic_Simulator.ViewModel
     public class MainViewModel : BaseViewModel
     {
         public bool IsAnimationActive;
-        private string _bgImage = @"C:\Users\petit\Desktop\repos\Traffic-Simulator\Traffic-Simulator\Traffic-Simulator\Assets\Image\mapa_v3.png";
+        private string _bgImage;
         private Thread _mainThread;
         private Thread _trainThread;
 
@@ -24,6 +24,11 @@ namespace Traffic_Simulator.ViewModel
             Cars = new ObservableCollection<CarData>();
             CarsThreads = new ObservableCollection<Thread>();
             IsAnimationActive = true;
+
+            // create path to Assets\Image\mapa_v3.png
+            string path = "Assets/Image/mapa_v3.png";
+
+            BgImage = path;
         }
 
         public DelegateCommand StartAnimationCommand { get; }
