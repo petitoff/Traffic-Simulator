@@ -71,6 +71,13 @@ public class CarsManagement
             Thread.Sleep(randomNumber);
             _mainViewModel.TrainData = null;
 
+            if (IsTrainActive)
+            {
+                return;
+            }
+
+            IsTrainActive = true;
+
             CreateTrain();
             //CreateThreadForTrain(_mainViewModel.TrainData);
             CreateThreadForInstance(_mainViewModel.TrainData, MoveTrain);
@@ -139,7 +146,7 @@ public class CarsManagement
         try
         {
             Point startPointTop = new Point(1033, -150);
-            Point startPointBottom = new Point(1033, 790);
+            Point startPointBottom = new Point(1033, 820);
 
             double fromTop = -2.21;
             double fromBottom = 2.22;
@@ -178,12 +185,7 @@ public class CarsManagement
         try
         {
             if (trainInstance == null) throw new ArgumentNullException(nameof(trainInstance));
-            if (IsTrainActive)
-            {
-                return;
-            }
 
-            IsTrainActive = true;
 
             _mainViewModel.TrainActiveMessage = "Pociąg jest aktywny";
 

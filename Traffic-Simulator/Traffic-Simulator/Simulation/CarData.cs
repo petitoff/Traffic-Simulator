@@ -59,13 +59,6 @@ namespace Traffic_Simulator.Simulation
             }
 
             var positionOfTheCarAfterThatCar = carAfterThatCar.Car.Position;
-            //foreach (var carData in carsWithSameTraversalDirection)
-            //{
-            //    if (carData.Car.Id == Car.Id - 1 && carData.Car.TraversalDirection == Car.TraversalDirection)
-            //    {
-            //        positionOfTheCarAfterThatCar = carData.Car.Position;
-            //    }
-            //}
 
             // sub Position of Car and Position of the car after that car
             double distanceBetweenCars = Math.Abs(Car.Position.X - positionOfTheCarAfterThatCar.X);
@@ -188,7 +181,7 @@ namespace Traffic_Simulator.Simulation
 
 
                 double distanceFromLeftBorder = 0;
-                const int distanceCarFromRailway = 960;
+                const int distanceCarFromRailway = 970;
 
                 if (_carsManagement.IsTrainActive && Car.Position.X is < distanceCarFromRailway and > 600)
                 {
